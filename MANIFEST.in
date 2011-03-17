@@ -1,0 +1,2 @@
+recursive-include codemirror/templates *
+recursive-include codemirror/javascript *

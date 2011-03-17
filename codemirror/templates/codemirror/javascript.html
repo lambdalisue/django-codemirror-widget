@@ -1,0 +1,13 @@
+<style type="text/css">
+    div.CodeMirror-wrapping{
+        border: 1px solid #666666;
+    }
+</style>
+<script type="text/javascript">
+CodeMirror.fromTextArea("{{ id }}", {
+    path: "{{ path }}",
+    parserfile: [{{ parsefile }}],
+    {# DO NOT wrap stylesheet variable with quote or square blanket #}
+    stylesheet: {{ stylesheet }},
+});
+</script>
