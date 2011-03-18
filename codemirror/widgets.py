@@ -75,14 +75,15 @@ class CodeMirrorTextarea(forms.Textarea):
         u"""Render CodeMirrorTextarea"""
         html = super(CodeMirrorTextarea, self).render(name, value, attrs)
         kwargs = {
-            'name': name,
-            'path': "%s%s/"%(settings.MEDIA_URL, self.path),
-            'parserfile': "%s" % (", ".join(["\"%s\""%x for x in self.parserfile])),
+            'id': "\"id_%s\""%name,
+            'path': "\"%s%s/\""%(settings.MEDIA_URL, self.path),
+            'parserfile': "[%s]" % (", ".join(["\"%s\""%x for x in self.parserfile])),
             'stylesheet': "[%s]" % (", ".join(["\"%s%s\""%(settings.MEDIA_URL,x) for x in self.stylesheet])),
         }
         if self.stylesheet == []:
             kwargs['stylesheet'] = '""'
-            
+        for key in kwargs.keys():
+            kwargs[key] = mark_safe(kwargs[key])
         code = render_to_string(r"codemirror/javascript.html", kwargs)
         body = "%s\n%s" % (html, code)
         return mark_safe(body)

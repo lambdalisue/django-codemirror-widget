@@ -1,6 +1,6 @@
 Metadata-Version: 1.0
 Name: django-codemirror-widget
-Version: 0.1rc1
+Version: 0.1rc2
 Summary: django-codemirror-widget is Django's textarea like widget for using CodeMirror on textarea
 Home-page: https://github.com/alisue/django-codemirror-widget
 Author: Alisue

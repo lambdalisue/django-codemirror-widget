@@ -4,10 +4,9 @@
     }
 </style>
 <script type="text/javascript">
-CodeMirror.fromTextArea("{{ id }}", {
-    path: "{{ path }}",
-    parserfile: [{{ parsefile }}],
-    {# DO NOT wrap stylesheet variable with quote or square blanket #}
+CodeMirror.fromTextArea({{ id }}, {
+    path: {{ path }},
+    parserfile: {{ parserfile }},
     stylesheet: {{ stylesheet }},
 });
 </script>
