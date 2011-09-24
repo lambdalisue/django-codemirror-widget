@@ -15,7 +15,7 @@ from django.core.exceptions import ImproperlyConfigured
 # set default settings
 CODEMIRROR_PATH  = getattr(settings, 'CODEMIRROR_PATH', 'codemirror')
 if CODEMIRROR_PATH.endswith('/'):
-    CODEMIRROR_PATH = settings.CODEMIRROR_PATH[:-1]
+    CODEMIRROR_PATH = CODEMIRROR_PATH[:-1]
 CODEMIRROR_DEFAULT_PARSERFILE  = getattr(settings, 'CODEMIRROR_DEFAULT_PARSERFILE', 'parsedummy.js')
 CODEMIRROR_DEFAULT_STYLESHEET  = getattr(settings, 'CODEMIRROR_DEFAULT_STYLESHEET', '')
 
@@ -29,7 +29,7 @@ class CodeMirrorTextarea(forms.Textarea):
     class Media:
         css = {}
         js = (
-            r"%s/js/codemirror.js" % settings.CODEMIRROR_PATH,
+            r"%s/js/codemirror.js" % CODEMIRROR_PATH,
         )
         
     def __init__(self, attrs=None, path=None, parserfile=None, stylesheet=None, **kwargs):
@@ -50,13 +50,13 @@ class CodeMirrorTextarea(forms.Textarea):
                   - codemirror.js
                   - parsexml.js
             *-------------------------------*
-            settings.CODEMIRROR_PATH = r"codemirror"
+            CODEMIRROR_PATH = r"codemirror"
             
             codemirror = CodeMirrorTextarea(
                 # parserfile='parsexml.js',                                # Can be written as the left when only one file is needed.
                 parserfile=['parsexml.js'],
                 # stylesheet=r'xmlcolors.css'    # Can be written as the left when only one file is needed.
-                stylesheet=[r'xmlcolors.css'],
+                stylesheet=[r'css/xmlcolors.css'],
             )
             document = forms.TextField(widget=codemirror)
         """
@@ -64,7 +64,7 @@ class CodeMirrorTextarea(forms.Textarea):
         self.path = path or settings.STATIC_URL + CODEMIRROR_PATH + '/js/'
         self.parserfile = parserfile or CODEMIRROR_DEFAULT_PARSERFILE
         self.stylesheet = stylesheet or CODEMIRROR_DEFAULT_STYLESHEET
-        self.stylesheet = ['css/' + css for css in self.stylesheet]
+        self.stylesheet = [settings.STATIC_URL + CODEMIRROR_PATH + '/' + css for css in self.stylesheet]
         if not hasattr(self.parserfile, '__iter__'):
             self.parserfile = (self.parserfile,)
         if not hasattr(self.stylesheet, '__iter__'):
@@ -84,7 +84,13 @@ class CodeMirrorTextarea(forms.Textarea):
         code = render_to_string(r"codemirror/javascript.html", kwargs)
         body = "%s\n%s" % (html, code)
         return mark_safe(body)
-    
+     
 class AdminCodeMirrorTextareaWidget(CodeMirrorTextarea, AdminTextareaWidget):
     u"""CodeMirrorTextarea for Admin site"""
     pass
+
+class AdminHTMLEditor(AdminCodeMirrorTextareaWidget):
+    def __init__(self, *args, **kwargs):
+        kwargs['parserfile'] = ["parsexml.js", "parsecss.js", "tokenizejavascript.js", "parsejavascript.js", "parsehtmlmixed.js"]
+        kwargs['stylesheet'] = ["css/xmlcolors.css", "css/jscolors.css", "css/csscolors.css"]
+        super(AdminHTMLEditor, self).__init__(*args, **kwargs)
