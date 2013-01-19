@@ -46,6 +46,9 @@ class CodeMirrorTextarea(forms.Textarea):
               + codemirror
                 + lib
                   - codemirror.js
+                + mode
+                  + python
+                    - python.js
             *-------------------------------*
             CODEMIRROR_PATH = r"codemirror"
 
