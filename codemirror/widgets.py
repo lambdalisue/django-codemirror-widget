@@ -7,7 +7,6 @@ import json, re
 from itertools import chain
 from django import forms
 from django.conf import settings
-from django.contrib.admin.widgets import AdminTextareaWidget
 from django.utils.safestring import mark_safe
 
 # set default settings
