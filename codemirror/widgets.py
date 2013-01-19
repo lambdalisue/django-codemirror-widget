@@ -60,7 +60,6 @@ class CodeMirrorTextarea(forms.Textarea):
     
     def render(self, name, value, attrs=None):
         u"""Render CodeMirrorTextarea"""
-        print('bar')
         output = [super(CodeMirrorTextarea, self).render(name, value, attrs),
             '<script type="text/javascript">CodeMirror.fromTextArea(document.getElementById(%s), { mode: %s });</script>' % ('"id_%s"' % name, json.dumps(self.mode))]
         return mark_safe('\n'.join(output))
