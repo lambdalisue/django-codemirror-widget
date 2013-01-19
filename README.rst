@@ -16,15 +16,13 @@ How to Use
 
 1.	First, you need to specified ``CODEMIRROR_PATH`` on ``settings.py``
 	``CODEMIRROR_PATH`` is the URI of CodeMirror directory like ``CODEMIRROR_PATH = r"javascript/codemirror"``
+	If you don't specify it, it defaults to ``'javascript'``
 2.	Use ``codemirror.widgets.CodeMirrorTextarea`` widgets for target Textarea like below::
 	
 		from django import forms
 		from codemirror.widgets import CodeMirrorTextarea
 
-		codemirror = CodeMirrorTextarea(
-			parserfile=['parsexml.js'],
-			stylesheet=[r'javascript/codemirror/css/xmlcolor.css'],
-		)
+		codemirror = CodeMirrorTextarea(mode="javascript")
 		document = forms.TextField(widget=codemirror)
 
 Settings
@@ -32,8 +30,6 @@ Settings
 ``CODEMIRROR_PATH``
     the URI of CodeMirror directory
 
-``CODEMIRROR_DEFAULT_PARSER``
-	the default parser (DEFAULT: 'parsedummy.js')
+``CODEMIRROR_MODE``
+	the default mode which may be a string or configuration map (DEFAULT: 'javascript')
 
-``CODEMIRROR_DEFAULT_STYLESHEET``
-	the default stylesheet (DEFAULT: '')
