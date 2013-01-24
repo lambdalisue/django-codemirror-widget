@@ -20,7 +20,7 @@ CODEMIRROR_CONFIG = getattr(settings, 'CODEMIRROR_CONFIG', { 'lineNumbers': True
 THEME_CSS_FILENAME_RE = re.compile(r'[\w-]+')
 
 class CodeMirrorTextarea(forms.Textarea):
-    u"""Textarea widget render with `CodeMirror`
+    """Textarea widget render with `CodeMirror`
 
     CodeMirror:
         http://codemirror.net/
@@ -40,7 +40,7 @@ class CodeMirrorTextarea(forms.Textarea):
             ))
     
     def __init__(self, attrs=None, mode=None, theme=None, config=None, **kwargs):
-        u"""Constructor of CodeMirrorTextarea
+        """Constructor of CodeMirrorTextarea
 
         Attribute:
             path          - CodeMirror directory URI (DEFAULT = settings.CODEMIRROR_PATH)
@@ -73,7 +73,7 @@ class CodeMirrorTextarea(forms.Textarea):
         super(CodeMirrorTextarea, self).__init__(attrs=attrs, **kwargs)
         
         mode = mode or CODEMIRROR_MODE
-        if isinstance(mode, basestring):
+        if isinstance(mode, str):
             mode = { 'name': mode }
         self.mode_name = mode['name']
         
@@ -91,7 +91,7 @@ class CodeMirrorTextarea(forms.Textarea):
             [('mode', mode), ('theme', theme)])))
     
     def render(self, name, value, attrs=None):
-        u"""Render CodeMirrorTextarea"""
+        """Render CodeMirrorTextarea"""
         output = [super(CodeMirrorTextarea, self).render(name, value, attrs),
             '<script type="text/javascript">CodeMirror.fromTextArea(document.getElementById(%s), %s);</script>' %
                 ('"id_%s"' % name, self.option_json)]
