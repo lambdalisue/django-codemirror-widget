@@ -37,9 +37,12 @@ class CodeMirrorTextarea(forms.Textarea):
             js = (
                 "%s/lib/codemirror.js" % CODEMIRROR_PATH,
                 "%s/mode/%s/%s.js" % (CODEMIRROR_PATH, mode_name, mode_name),
-            ))
+            ) + tuple(
+                "%s/mode/%s/%s.js" % (CODEMIRROR_PATH, dependency, dependency)
+                    for dependency in self.dependencies)
+            )
     
-    def __init__(self, attrs=None, mode=None, theme=None, config=None, **kwargs):
+    def __init__(self, attrs=None, mode=None, theme=None, config=None, dependencies=(), **kwargs):
         u"""Constructor of CodeMirrorTextarea
 
         Attribute:
@@ -76,6 +79,7 @@ class CodeMirrorTextarea(forms.Textarea):
         if isinstance(mode, basestring):
             mode = { 'name': mode }
         self.mode_name = mode['name']
+        self.dependencies = dependencies
         
         theme = theme or CODEMIRROR_THEME
         theme_css_filename = THEME_CSS_FILENAME_RE.search(theme).group(0)
