@@ -26,7 +26,7 @@ def isstring(obj):
         return isinstance(obj, str)
 
 class CodeMirrorTextarea(forms.Textarea):
-    """Textarea widget render with `CodeMirror`
+    u"""Textarea widget render with `CodeMirror`
 
     CodeMirror:
         http://codemirror.net/
@@ -48,13 +48,8 @@ class CodeMirrorTextarea(forms.Textarea):
                     for dependency in self.dependencies)
             )
     
-<<<<<<< HEAD
     def __init__(self, attrs=None, mode=None, theme=None, config=None, dependencies=(), **kwargs):
         u"""Constructor of CodeMirrorTextarea
-=======
-    def __init__(self, attrs=None, mode=None, theme=None, config=None, **kwargs):
-        """Constructor of CodeMirrorTextarea
->>>>>>> d3130cbe429c6489cc47e8a6f732cf944d948687
 
         Attribute:
             path          - CodeMirror directory URI (DEFAULT = settings.CODEMIRROR_PATH)
@@ -87,11 +82,7 @@ class CodeMirrorTextarea(forms.Textarea):
         super(CodeMirrorTextarea, self).__init__(attrs=attrs, **kwargs)
         
         mode = mode or CODEMIRROR_MODE
-<<<<<<< HEAD
         if isstring(mode):
-=======
-        if isinstance(mode, str):
->>>>>>> d3130cbe429c6489cc47e8a6f732cf944d948687
             mode = { 'name': mode }
         self.mode_name = mode['name']
         self.dependencies = dependencies
@@ -110,7 +101,7 @@ class CodeMirrorTextarea(forms.Textarea):
             [('mode', mode), ('theme', theme)])))
     
     def render(self, name, value, attrs=None):
-        """Render CodeMirrorTextarea"""
+        u"""Render CodeMirrorTextarea"""
         output = [super(CodeMirrorTextarea, self).render(name, value, attrs),
             '<script type="text/javascript">CodeMirror.fromTextArea(document.getElementById(%s), %s);</script>' %
                 ('"id_%s"' % name, self.option_json)]
