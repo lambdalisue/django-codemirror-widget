@@ -19,6 +19,12 @@ CODEMIRROR_CONFIG = getattr(settings, 'CODEMIRROR_CONFIG', { 'lineNumbers': True
 
 THEME_CSS_FILENAME_RE = re.compile(r'[\w-]+')
 
+def isstring(obj):
+    try:
+        return isinstance(obj, basestring)
+    except NameError:
+        return isinstance(obj, str)
+
 class CodeMirrorTextarea(forms.Textarea):
     u"""Textarea widget render with `CodeMirror`
 
@@ -76,7 +82,7 @@ class CodeMirrorTextarea(forms.Textarea):
         super(CodeMirrorTextarea, self).__init__(attrs=attrs, **kwargs)
         
         mode = mode or CODEMIRROR_MODE
-        if isinstance(mode, basestring):
+        if isstring(mode):
             mode = { 'name': mode }
         self.mode_name = mode['name']
         self.dependencies = dependencies
