@@ -60,6 +60,8 @@ class CodeMirrorTextarea(forms.Textarea):
                             (DEFAULT = settings.CODEMIRROR_THEME)
             config        - The rest of the options passed into CodeMirror as a python map.
                             (updated from settings.CODEMIRROR_CONFIG)
+            dependencies  - Some modes depend on others, you can pass extra modes dependencies with this argument.
+                            For example for mode="htmlmixed", you must pass dependencies=("xml", "javascript", "css").
 
         Example:
             *-------------------------------*
