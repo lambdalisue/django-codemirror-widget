@@ -42,3 +42,7 @@ Settings
 ``CODEMIRROR_CONFIG``
     base mapping for the rest of the CodeMirror options (DEFAULT: ``{ 'lineNumbers': True }``)
 
+``CODEMIRROR_JS_VAR_FORMAT``
+    A format string interpolated with the form field name to name a global JS variable that will hold the CodeMirror
+    editor object. For example with ``CODEMIRROR_JS_VAR_FORMAT = "%s_editor"`` and a field named 'code', the JS variable
+    name would be 'code_editor'. If ``CODEMIRROR_JS_VAR_FORMAT`` is None, no global variable is created (DEFAULT: None)

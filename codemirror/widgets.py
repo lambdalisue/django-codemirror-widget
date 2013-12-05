@@ -16,6 +16,7 @@ if CODEMIRROR_PATH.endswith('/'):
 CODEMIRROR_MODE = getattr(settings, 'CODEMIRROR_MODE', 'javascript')
 CODEMIRROR_THEME = getattr(settings, 'CODEMIRROR_THEME', 'default')
 CODEMIRROR_CONFIG = getattr(settings, 'CODEMIRROR_CONFIG', { 'lineNumbers': True })
+CODEMIRROR_JS_VAR_FORMAT = getattr(settings, 'CODEMIRROR_JS_VAR_FORMAT', None)
 
 THEME_CSS_FILENAME_RE = re.compile(r'[\w-]+')
 
@@ -48,7 +49,7 @@ class CodeMirrorTextarea(forms.Textarea):
                     for dependency in self.dependencies)
             )
     
-    def __init__(self, attrs=None, mode=None, theme=None, config=None, dependencies=(), **kwargs):
+    def __init__(self, attrs=None, mode=None, theme=None, config=None, dependencies=(), js_var_format=None, **kwargs):
         u"""Constructor of CodeMirrorTextarea
 
         Attribute:
@@ -62,6 +63,10 @@ class CodeMirrorTextarea(forms.Textarea):
                             (updated from settings.CODEMIRROR_CONFIG)
             dependencies  - Some modes depend on others, you can pass extra modes dependencies with this argument.
                             For example for mode="htmlmixed", you must pass dependencies=("xml", "javascript", "css").
+            js_var_format - A format string interpolated with the form field name to name a global JS variable that will
+                            hold the CodeMirror editor object. For example with js_var_format="%s_editor" and a field
+                            named "code", the JS variable name would be "code_editor". If None is passed, no global
+                            variable is created (DEFAULT = settings.CODEMIRROR_JS_VAR_FORMAT)
 
         Example:
             *-------------------------------*
@@ -88,6 +93,7 @@ class CodeMirrorTextarea(forms.Textarea):
             mode = { 'name': mode }
         self.mode_name = mode['name']
         self.dependencies = dependencies
+        self.js_var_format = js_var_format or CODEMIRROR_JS_VAR_FORMAT
         
         theme = theme or CODEMIRROR_THEME
         theme_css_filename = THEME_CSS_FILENAME_RE.search(theme).group(0)
@@ -104,8 +110,12 @@ class CodeMirrorTextarea(forms.Textarea):
     
     def render(self, name, value, attrs=None):
         u"""Render CodeMirrorTextarea"""
+        if self.js_var_format is not None:
+            js_var_bit = 'var %s = ' % (self.js_var_format % name)
+        else:
+            js_var_bit = ''
         output = [super(CodeMirrorTextarea, self).render(name, value, attrs),
-            '<script type="text/javascript">CodeMirror.fromTextArea(document.getElementById(%s), %s);</script>' %
-                ('"id_%s"' % name, self.option_json)]
+            '<script type="text/javascript">%sCodeMirror.fromTextArea(document.getElementById(%s), %s);</script>' %
+                (js_var_bit, '"id_%s"' % name, self.option_json)]
         return mark_safe('\n'.join(output))
 
