@@ -18,13 +18,13 @@ How to Use
 	``CODEMIRROR_PATH`` is the URI of CodeMirror directory like ``CODEMIRROR_PATH = r"javascript/codemirror"``.
 	If you don't specify it, it defaults to ``'codemirror'``.
 	CodeMirror should be put there.
-2.	Use ``codemirror.widgets.CodeMirrorTextarea`` widgets for target Textarea like below::
-	
-		from django import forms
-		from codemirror.widgets import CodeMirrorTextarea
+2.	Use ``codemirror.CodeMirrorTextarea`` widget for target Textarea like below::
 
-		codemirror = CodeMirrorTextarea(mode="python", theme="cobalt", config={ 'fixedGutter': True })
-		document = forms.TextField(widget=codemirror)
+		from django import forms
+		from codemirror import CodeMirrorTextarea
+
+		codemirror_widget = CodeMirrorTextarea(mode="python", theme="cobalt", config={ 'fixedGutter': True })
+		document = forms.TextField(widget=codemirror_widget)
 
 
 Settings
