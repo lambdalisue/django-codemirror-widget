@@ -3,11 +3,15 @@
 # Created:    2010/09/09
 # Author:         alisue
 #
-import json, re
 from itertools import chain
+import re
+
 from django import forms
 from django.conf import settings
 from django.utils.safestring import mark_safe
+
+from codemirror import utils
+
 
 # set default settings
 CODEMIRROR_PATH = getattr(settings, 'CODEMIRROR_PATH', 'codemirror')
@@ -20,11 +24,6 @@ CODEMIRROR_JS_VAR_FORMAT = getattr(settings, 'CODEMIRROR_JS_VAR_FORMAT', None)
 
 THEME_CSS_FILENAME_RE = re.compile(r'[\w-]+')
 
-def isstring(obj):
-    try:
-        return isinstance(obj, basestring)
-    except NameError:
-        return isinstance(obj, str)
 
 class CodeMirrorTextarea(forms.Textarea):
     u"""Textarea widget render with `CodeMirror`
@@ -32,24 +31,40 @@ class CodeMirrorTextarea(forms.Textarea):
     CodeMirror:
         http://codemirror.net/
     """
-    
+
     @property
     def media(self):
         mode_name = self.mode_name
-        return forms.Media(css = {
-                'all': ("%s/lib/codemirror.css" % CODEMIRROR_PATH,) +
+        js = ["%s/lib/codemirror.js" % CODEMIRROR_PATH]
+
+        if not self.custom_mode:
+            js.append("%s/mode/%s/%s.js" % (CODEMIRROR_PATH, mode_name, mode_name))
+
+        js.extend(
+            "%s/mode/%s/%s.js" % (CODEMIRROR_PATH, dependency, dependency)
+                for dependency in self.dependencies)
+        js.extend("%s/addon/%s.js" % (CODEMIRROR_PATH, addon) for addon in self.addon_js)
+
+        if self.keymap:
+            js.append("%s/keymap/%s.js" % (CODEMIRROR_PATH, self.keymap))
+
+        if self.custom_js:
+            js.extend(self.custom_js)
+
+        return forms.Media(css={
+            'all': ("%s/lib/codemirror.css" % CODEMIRROR_PATH,) +
                     tuple("%s/theme/%s.css" % (CODEMIRROR_PATH, theme_css_filename)
-                        for theme_css_filename in self.theme_css),
+                        for theme_css_filename in self.theme_css) +
+                    tuple("%s/addon/%s.css" % (CODEMIRROR_PATH, css_file)
+                        for css_file in self.addon_css),
             },
-            js = (
-                "%s/lib/codemirror.js" % CODEMIRROR_PATH,
-                "%s/mode/%s/%s.js" % (CODEMIRROR_PATH, mode_name, mode_name),
-            ) + tuple(
-                "%s/mode/%s/%s.js" % (CODEMIRROR_PATH, dependency, dependency)
-                    for dependency in self.dependencies)
-            )
-    
-    def __init__(self, attrs=None, mode=None, theme=None, config=None, dependencies=(), js_var_format=None, **kwargs):
+            js=js
+        )
+
+    def __init__(
+            self, attrs=None, mode=None, theme=None, config=None, dependencies=(),
+            js_var_format=None, addon_js=(), addon_css=(), custom_mode=None, custom_js=(),
+            keymap=None, **kwargs):
         u"""Constructor of CodeMirrorTextarea
 
         Attribute:
@@ -67,6 +82,19 @@ class CodeMirrorTextarea(forms.Textarea):
                             hold the CodeMirror editor object. For example with js_var_format="%s_editor" and a field
                             named "code", the JS variable name would be "code_editor". If None is passed, no global
                             variable is created (DEFAULT = settings.CODEMIRROR_JS_VAR_FORMAT)
+            addon_js      - Various addons are available for CodeMirror. You can pass the names of any addons to load
+                            with this argument. For example, for mode="django", you must pass addons=("mode/overlay", ).
+            addon_css     - Some addons require corresponding CSS files. Since not every addon requires a CSS file, and
+                            the names of these files do not always follow a convention, they must be listed separately.
+                            For example, addon_css=("display/fullscreen", ).
+            custom_mode   - To use a custom mode (i.e. one not included in the standard CodeMirror distribution), set this to
+                            the name, or configuration object, of the mode, and ensure "mode" is None. For example,
+                            custom_mode="my_custom_mode".
+            custom_js     - To include other Javascript files with this widget that are not defined in the CodeMirror package,
+                            set this to a list of pathnames. If "custom_mode" is defined, this will probably contain the path
+                            of the file defining that mode. Paths in this list will not be prepended with settings.CODEMIRROR_PATH.
+                            For example, custom_js=("site_js/my_custom_mode.js", )
+            keymap        - The name of a keymap to use. Keymaps are located in settings.CODEMIRROR_PATH/keymap. Default: None.
 
         Example:
             *-------------------------------*
@@ -80,6 +108,12 @@ class CodeMirrorTextarea(forms.Textarea):
                     - python.js
                 + theme
                   + cobalt.css
+                + addon
+                  + display
+                    - fullscreen.js
+                    - fullscreen.css
+              + site_js
+                - my_custom_mode.js
             *-------------------------------*
             CODEMIRROR_PATH = "codemirror"
 
@@ -87,27 +121,32 @@ class CodeMirrorTextarea(forms.Textarea):
             document = forms.TextField(widget=codemirror)
         """
         super(CodeMirrorTextarea, self).__init__(attrs=attrs, **kwargs)
-        
-        mode = mode or CODEMIRROR_MODE
-        if isstring(mode):
+
+        mode = mode or custom_mode or CODEMIRROR_MODE
+        if utils.isstring(mode):
             mode = { 'name': mode }
         self.mode_name = mode['name']
+        self.custom_mode = custom_mode
         self.dependencies = dependencies
+        self.addon_js = addon_js
+        self.addon_css = addon_css
+        self.custom_js = custom_js
+        self.keymap = keymap
         self.js_var_format = js_var_format or CODEMIRROR_JS_VAR_FORMAT
-        
+
         theme = theme or CODEMIRROR_THEME
         theme_css_filename = THEME_CSS_FILENAME_RE.search(theme).group(0)
         if theme_css_filename == 'default':
             self.theme_css = []
         else:
             self.theme_css = [theme_css_filename]
-        
+
         config = config or {}
-        self.option_json = json.dumps(dict(chain(
+        self.option_json = utils.CodeMirrorJSONEncoder().encode(dict(chain(
             CODEMIRROR_CONFIG.items(),
             config.items(),
             [('mode', mode), ('theme', theme)])))
-    
+
     def render(self, name, value, attrs=None):
         u"""Render CodeMirrorTextarea"""
         if self.js_var_format is not None:
@@ -118,4 +157,3 @@ class CodeMirrorTextarea(forms.Textarea):
             '<script type="text/javascript">%sCodeMirror.fromTextArea(document.getElementById(%s), %s);</script>' %
                 (js_var_bit, '"id_%s"' % name, self.option_json)]
         return mark_safe('\n'.join(output))
-
