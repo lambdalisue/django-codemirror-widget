@@ -83,7 +83,7 @@ class CodeMirrorTextarea(forms.Textarea):
                             named "code", the JS variable name would be "code_editor". If None is passed, no global
                             variable is created (DEFAULT = settings.CODEMIRROR_JS_VAR_FORMAT)
             addon_js      - Various addons are available for CodeMirror. You can pass the names of any addons to load
-                            with this argument. For example, for mode="django", you must pass addons=("mode/overlay", ).
+                            with this argument. For example, for mode="django", you must pass addon_js=("mode/overlay", ).
             addon_css     - Some addons require corresponding CSS files. Since not every addon requires a CSS file, and
                             the names of these files do not always follow a convention, they must be listed separately.
                             For example, addon_css=("display/fullscreen", ).
