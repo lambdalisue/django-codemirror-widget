@@ -49,9 +49,19 @@ class CodeMirrorJSONEncoder(json.JSONEncoder):
         self.stash = {}
 
     def default(self, obj):
+        def encode_if_necessary(x):
+            try:
+                x.encode
+            except AttributeError:
+                return x
+            else:
+                return x.encode("utf-8")
+
         if isinstance(obj, CodeMirrorJavascript):
             # If a Javascript object is encountered, replace it with a placeholder.
-            stash_id = self.stash_prefix + hashlib.md5(obj.js).hexdigest()
+            stash_id = (
+                self.stash_prefix
+                + hashlib.md5(encode_if_necessary(obj.js)).hexdigest())
             self.stash[stash_id] = obj.js
             return stash_id
         return super(CodeMirrorJSONEncoder, self).default(obj)
