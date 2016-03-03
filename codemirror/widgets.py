@@ -51,12 +51,20 @@ class CodeMirrorTextarea(forms.Textarea):
         if self.custom_js:
             js.extend(self.custom_js)
 
-        return forms.Media(css={
-            'all': ("%s/lib/codemirror.css" % CODEMIRROR_PATH,) +
-                    tuple("%s/theme/%s.css" % (CODEMIRROR_PATH, theme_css_filename)
-                        for theme_css_filename in self.theme_css) +
-                    tuple("%s/addon/%s.css" % (CODEMIRROR_PATH, css_file)
-                        for css_file in self.addon_css),
+        css = ["%s/lib/codemirror.css" % CODEMIRROR_PATH]
+        css.extend(
+            "%s/theme/%s.css" % (CODEMIRROR_PATH, theme_css_filename)
+                for theme_css_filename in self.theme_css)
+        css.extend(
+            "%s/addon/%s.css" % (CODEMIRROR_PATH, css_file)
+                for css_file in self.addon_css)
+
+        if self.custom_css:
+            css.extend(self.custom_css)
+
+        return forms.Media(
+            css={
+                'all': css
             },
             js=js
         )
@@ -64,7 +72,7 @@ class CodeMirrorTextarea(forms.Textarea):
     def __init__(
             self, attrs=None, mode=None, theme=None, config=None, dependencies=(),
             js_var_format=None, addon_js=(), addon_css=(), custom_mode=None, custom_js=(),
-            keymap=None, **kwargs):
+            keymap=None, custom_css=None, **kwargs):
         u"""Constructor of CodeMirrorTextarea
 
         Attribute:
@@ -95,6 +103,9 @@ class CodeMirrorTextarea(forms.Textarea):
                             of the file defining that mode. Paths in this list will not be prepended with settings.CODEMIRROR_PATH.
                             For example, custom_js=("site_js/my_custom_mode.js", )
             keymap        - The name of a keymap to use. Keymaps are located in settings.CODEMIRROR_PATH/keymap. Default: None.
+            custom_css    - To include other CSS files with this widget that are not defined in the CodeMirror package,
+                            set this to a list of pathnames. Paths in this list will not be prepended with any path.
+                            For example, custom_css=("site_css/my_styles.css", )
 
         Example:
             *-------------------------------*
@@ -131,6 +142,7 @@ class CodeMirrorTextarea(forms.Textarea):
         self.addon_js = addon_js
         self.addon_css = addon_css
         self.custom_js = custom_js
+        self.custom_css = custom_css
         self.keymap = keymap
         self.js_var_format = js_var_format or CODEMIRROR_JS_VAR_FORMAT
 
