@@ -1,36 +1,53 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-#
-# Author:       Alisue
-# Last Change:  18-Mar-2011.
-#
 from setuptools import setup, find_packages
 
-version = "0.4.1"
+NAME = 'django-codemirror-widget'
+VERSION = '0.4.1'
+
 
 def read(filename):
-    import os.path
-    return open(os.path.join(os.path.dirname(__file__), filename)).read()
+    import os
+    BASE_DIR = os.path.dirname(__file__)
+    filename = os.path.join(BASE_DIR, filename)
+    with open(filename, 'r') as fi:
+        return fi.read()
+
+ 
+def readlist(filename):
+    rows = read(filename).split("\n")
+    rows = [x.strip() for x in rows if x.strip()]
+    return list(rows)
+
+ 
 setup(
-    name="django-codemirror-widget",
-    version=version,
-    description = "django-codemirror-widget is Django form widget library for using CodeMirror on textarea",
+    name=NAME,
+    version=VERSION,
+    description="Django form widget library for using CodeMirror on textarea",
     long_description=read('README.rst'),
-    classifiers = [
+    classifiers=[
+        'Development Status :: 5 - Production/Stable',
+        'Environment :: Web Environment',
         'Framework :: Django',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: BSD License',
+        'License :: OSI Approved :: MIT License',
         'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
         'Topic :: Internet :: WWW/HTTP',
+        'Topic :: Software Development :: Libraries',
+        'Topic :: Software Development :: Libraries :: Application Frameworks',
+        'Topic :: Software Development :: Libraries :: Python Modules',
     ],
-    keywords = "django widget textarea codemirror",
-    author = "Alisue",
-    author_email = "lambdalisue@hashnote.net",
-    url=r"https://github.com/lambdalisue/django-codemirror-widget",
-    download_url = r"https://github.com/lambdalisue/django-codemirror-widget/tarball/master",
-    license = 'BSD',
-    packages = find_packages(),
-    include_package_data = True,
-    zip_safe = False,
-    install_requires=['setuptools'],
+    keywords="django widget textarea codemirror",
+    author="Alisue",
+    author_email="lambdalisue@hashnote.net",
+    url="https://github.com/lambdalisue/django-codemirror-widget",
+    download_url="https://github.com/lambdalisue/%s/tarball/master" % NAME,
+    license='MIT',
+    packages=find_packages(),
+    include_package_data=True,
+    zip_safe=True,
 )
